@@ -20,6 +20,6 @@ proc_hang:
      b proc_hang
 
 master:
-    ldr x1, =_stack + 0xff0
+    ldr x1, =_stack + 0xfff0
     mov sp, x1
     b main

@@ -1625,7 +1625,7 @@ def main() -> int:
     if len(monitor_elf.segments) > 1:
         raise Exception("monitor ({monitor_elf_path}) has {len(monitor_elf.segments)} segments; must only have one")
 
-    invocation_table_size = kernel_config.minimum_page_size
+    invocation_table_size = kernel_config.minimum_page_size * 2
     system_cnode_size = 2
 
     while True:

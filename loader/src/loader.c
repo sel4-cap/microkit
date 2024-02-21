@@ -154,6 +154,8 @@ putc(uint8_t ch)
 {
     while (!(*UART_REG(STAT) & STAT_TDRE)) { }
     *UART_REG(TRANSMIT) = ch;
+    if (ch == '\n')
+        *UART_REG(TRANSMIT) = '\r';
 }
 #else
 #error Board not defined
@@ -335,6 +337,11 @@ print_loader_data(void)
     puthex64(loader_data->ui_p_reg_end - loader_data->pv_offset);
     puts("\nLDR|INFO:              entry  : ");
     puthex64(loader_data->v_entry);
+    puts("\n");
+    puts("LDR|INFO: stack: ");
+    puthex64((uint64_t)&_stack[0]);
+    puts(" -- ");
+    puthex64(((uint64_t)&_stack[STACK_SIZE-1]));
     puts("\n");
 
     for (uint32_t i = 0; i < loader_data->num_regions; i++) {
