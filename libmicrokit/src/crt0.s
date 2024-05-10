@@ -10,6 +10,6 @@
 .global _start;
 .type _start, %function;
 _start:
-    ldr x1, =_stack + 0x3FFE
+    ldr x1, =_stack + 0xFFFE
     mov sp, x1
     b main
