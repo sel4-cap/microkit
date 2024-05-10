@@ -121,6 +121,46 @@ SUPPORTED_BOARDS = (
             "hello": Path("example/imx8mq_evk/hello")
         }
     ),
+    BoardInfo(
+        name="odroidc2",
+        gcc_cpu="cortex-a53",
+        loader_link_address=0x20000000,
+        kernel_options={
+            "KernelPlatform": "odroidc2",
+            "KernelIsMCS": True,
+            "KernelArmExportPCNTUser": True,
+        },
+        examples={
+            "hello": Path("example/odroidc2/hello")
+        }
+    ),
+    BoardInfo(
+        name="odroidc4",
+        gcc_cpu="cortex-a55",
+        loader_link_address=0x20000000,
+        kernel_options={
+            "KernelPlatform": "odroidc4",
+            "KernelIsMCS": True,
+            "KernelArmExportPCNTUser": True,
+        },
+        examples={
+            "timer": Path("example/odroidc4/timer")
+        }
+    ),
+    BoardInfo(
+        name="qemu_virt_aarch64",
+        gcc_cpu="cortex-a53",
+        loader_link_address=0x70000000,
+        kernel_options={
+            "KernelPlatform": "qemu-arm-virt",
+            "KernelIsMCS": True,
+            "KernelArmExportPCNTUser": True,
+            "QEMU_MEMORY": "2048",
+        },
+        examples={
+            "hello": Path("example/qemu_virt_aarch64/hello")
+        }
+    ),
 )
 
 SUPPORTED_CONFIGS = (
@@ -204,6 +244,8 @@ def build_tool(tool_target: Path, target_triple: str) -> None:
     assert r == 0
 
     copy(tool_output, tool_target)
+
+    tool_target.chmod(0o777)
 
 
 def build_sel4(

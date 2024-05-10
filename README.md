@@ -9,7 +9,7 @@ The purpose of the seL4 Microkit is to enable system designers to create static 
 
 The seL4 Microkit consists of three parts:
 
-   * Microkit Library
+   * Microkit library
    * Microkit initial task
    * Microkit tool
 
@@ -44,6 +44,7 @@ Please file an issue if additional packages are required.
 * ARM GCC compiler for none-elf; version 12.2.1 20221205
 * device tree compiler
 * xmllint
+* qemu-system-aarch64
 
 To build the documentation you also need
 * pandoc
@@ -56,11 +57,12 @@ To build the documentation you also need
 On a Debian-like system you can do:
 
     $ sudo apt install build-essential git cmake ninja-build \
-	    device-tree-compiler libxml2-utils \
-		pandoc texlive-latex-base texlive-latex-recommended \
-		texlive-fonts-recommended texlive-fonts-extra \
-		python3 python3-venv \
-		musl-dev musl-tools
+        device-tree-compiler libxml2-utils \
+        pandoc texlive-latex-base texlive-latex-recommended \
+        texlive-fonts-recommended texlive-fonts-extra \
+        python3.9 python3.9-venv \
+        musl-dev musl-tools \
+        qemu-system-arm
 
 If you do not have Python 3.9 available, you can get it via the
 *deadsnakes* PPA: https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
@@ -72,7 +74,7 @@ To use this:
 
 On macOS, with the [Homebrew](https://brew.sh) package manager you can do:
 
-    $ brew install pandoc cmake dtc ninja qemu libxml2 python@3.9 coreutils texlive
+    $ brew install pandoc cmake dtc ninja qemu libxml2 python@3.9 coreutils texlive qemu
 
 Additonally, a number of Python libraries are needed.
 These should be installed using `pip`.
@@ -113,7 +115,7 @@ Please clone seL4 from:
 
 The correct branch to use is `microkit`.
 
-Testing has been performed using commit `7008430d4432c71a74b2a1da0afae58f7a8658df`.
+Testing has been performed using commit `57975d485397ce1744f7163644dd530560d0b7ec`.
 
 ## Building the SDK
 
@@ -150,22 +152,32 @@ The SDK top-level directory is `microkit-sdk-$VERSION`.
 The directory layout underneath the top-level directory is:
 
 ```
+doc/
+doc/microkit_user_manual.pdf
 bin/
 bin/microkit
+board/
 board/$board/$config/include/
 board/$board/$config/include/microkit.h
 board/$board/$config/lib/
 board/$board/$config/lib/libmicrokit.a
 board/$board/$config/lib/microkit.ld
-board/$board/$config/elf
+board/$board/$config/elf/
 board/$board/$config/elf/loader.elf
-board/$board/$config/elf/kernel.elf
+board/$board/$config/elf/sel4.elf
 board/$board/$config/elf/monitor.elf
 ```
 
-The currently supported boards:
+The currently supported boards are:
 
+* imx8mm_evk
+* imx8mq_evk
+* maaxboard
+* odroidc2
+* odroidc4
+* qemu_virt_aarch64
 * tqma8xqp1gb
+* zcu102
 
 The currently supported configurations are:
 
@@ -174,18 +186,7 @@ The currently supported configurations are:
 
 ## Supported Boards
 
-### tqma8xqp-1gb
-
-The TQMa8Xx Embedded Module from TQ Group configured with the NXP i.MX8QXP SoC and 1GiB of DDR3 ECC memory.
-
-https://www.tq-group.com/en/products/tq-embedded/arm-architecture/tqma8xx/
-
-All testing has been performed with the module on the MBa8Xx carrier board which is included in the starter kit.
-
-The provided board support should be at the module level and does not make any assumptions about the carrier board.
-
-Note: There are different configured of the TQMa8Xx board which include different NXP SoCs and different memory configurations.
-Such modules are not supported.
+For documentation on each supported board see the [manual](https://github.com/seL4/microkit/blob/main/docs/manual.md#board-support-packages-bsps).
 
 ## Supported Configurations
 

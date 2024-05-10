@@ -57,7 +57,7 @@ The SDK includes the tools, libraries and binaries required to build an Microkit
 The Microkit source is also available which allows you to customize or extend Microkit and produce your own SDK.
 
 To build an Microkit system you will write some programs that use `libmicrokit`.
-Microkit programs are a little different to a typical progress on a Linux-like operating system.
+Microkit programs are a little different to a typical process on a Linux-like operating system.
 Rather than a single `main` entry point, a program has three distinct entry points: `init`, `notified` and, optionally, `protected`.
 
 The individual programs are combined to produce a single bootable *system image*.
@@ -82,7 +82,7 @@ The [Microkit tool](#tool) chapter describes the host system tool used for gener
 
 The [libmicrokit](#libmicrokit) chapter describes the interfaces to the Microkit library.
 
-The [System Description Format](#sysdesc) chapter describes the format of the system description XML file.
+The [System Description File](#sysdesc) chapter describes the format of the system description XML file.
 
 The [Board Support Packages](#bsps) chapter describes each of the board support packages included in the SDK.
 
@@ -353,6 +353,7 @@ Additionally, if the protection domain provides a protected procedure it must al
     void microkit_notify(microkit_channel ch);
     microkit_msginfo microkit_msginfo_new(uint64_t label, uint16_t count);
     uint64_t microkit_msginfo_get_label(microkit_msginfo msginfo);
+    uint64_t microkit_msginfo_get_count(microkit_msginfo msginfo);
     void microkit_irq_ack(microkit_channel ch);
     void microkit_mr_set(uint8_t mr, uint64_t value);
     uint64_t microkit_mr_get(uint8_t mr);
@@ -421,21 +422,25 @@ The message can be passed to `microkit_ppcall` or returned from `protected`.
 
 Returns the label from a message.
 
+## `uint64_t microkit_msginfo_get_count(microkit_msginfo msginfo)`
+
+Returns the count of message registers in the message.
+
 ## `uint64_t microkit_mr_get(uint8_t mr)`
 
 Get a message register.
 
-## `void microkit_mr_set(uint8_t mr, uint64_t)`
+## `void microkit_mr_set(uint8_t mr, uint64_t value)`
 
 Set a message register.
 
 
-# System Description Format {#sysdesc}
+# System Description File {#sysdesc}
 
-This section describes the format of the system description file.
-This file is provided as the input to the `microkit` tool.
+This section describes the format of the System Description File (SDF).
 
-The system description file is an XML file.
+The system description file is an XML file that is provided as input to the
+`microkit` tool.
 
 The root element of the XML file is `system`.
 
@@ -535,6 +540,24 @@ Microkit produces a raw binary file, so when using U-Boot you must execute the i
 
     => go 0x40480000
 
+## Odroid-C2
+
+The HardKernel Odroid-C2 is an ARM SBC based on the Amlogic Meson S905 system-on-chip. It
+should be noted that the Odroid-C2 is no longer available for purchase but its successor,
+the Odroid-C4, is readily available at the time of writing.
+
+Microkit produces a raw binary file, so when using U-Boot you must execute the image using:
+
+    => go 0x20000000
+
+## Odroid-C4
+
+The HardKernel Odroid-C4 is an ARM SBC based on the Amlogic Meson S905X3 system-on-chip.
+
+Microkit produces a raw binary file, so when using U-Boot you must execute the image using:
+
+    => go 0x20000000
+
 ## TQMa8XQP 1GB
 
 The TQMa8XQP is a system-on-module designed by TQ-Systems GmbH.
@@ -543,6 +566,9 @@ The modules incorporates an NXP i.MX8X Quad Plus system-on-chip and 1GiB ECC mem
 TQ-Systems provide the MBa8Xx carrier board for development purposes.
 The instructions provided assume the use of the MBa8Xx carrier board.
 If you are using a different carrier board please refer to the appropriate documentation.
+
+Note: There are different configured of the TQMa8Xx board which include different NXP SoCs
+and different memory configurations. Such modules are not supported.
 
 The MBa8Xx provides access to the TQMa8XQP UART via UART-USB bridge.
 To access the UART connect a USB micro cable to port **X13**.
@@ -594,6 +620,27 @@ Rather than typing these each time you can create a U-Boot script:
 
 When debugging is enabled the kernel will use the same UART as U-Boot.
 
+## QEMU virt (AArch64)
+
+Support is available for the virtual AArch64 QEMU platform. This is a platform that is not based
+on any specific SoC or hardware platform and is intended for simulating systems for
+development or testing.
+
+It should be noted that the platform support is configured with 2GB of main memory and a single
+Cortex-A53 CPU.
+
+You can use the following command to simulate a Microkit system:
+
+    $ qemu-system-aarch64 \
+        -machine virt \
+        -cpu cortex-a53 \
+        -nographic \
+        -serial mon:stdio \
+        -device loader,file=[SYSTEM IMAGE],addr=0x70000000,cpu-num=0 \
+        -m size=2G
+
+You can find more about the QEMU virt platform in the
+[QEMU documentation](https://www.qemu.org/docs/master/system/target-arm.html).
 
 ## ZCU102
 
@@ -606,8 +653,6 @@ The ZCU102 can run on a physical board or on an appropriate QEMU based emulator.
 Microkit produces a raw binary file, so when using U-Boot you must execute the image using:
 
     => go 0x40000000
-
-Note that the loading address must be `0x40000000`.
 
 For simulating the ZCU102 using QEMU, use the following command:
 
